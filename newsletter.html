@@ -3,27 +3,56 @@
     console.log("Script initialized");
     const formWrapper = document.querySelector(".w-form");
     const form = formWrapper.querySelector("form");
-    form.style.display = "block"; // Show the form initially
+    console.log("Form found:", form);
+
+    // Store form data when the form is submitted
+    let lastFormData = null;
+
+    // Capture form data before Webflow processes it
+    form.addEventListener(
+      "submit",
+      function (e) {
+        console.log("Form submit event triggered");
+        // Prevent the default submission temporarily
+        e.preventDefault();
+
+        // Capture the form data
+        lastFormData = new FormData(form);
+        console.log("Form data captured:", Array.from(lastFormData.entries()));
+
+        // Continue with the form submission
+        setTimeout(() => form.submit(), 0);
+      },
+      true
+    ); // Use capturing phase
 
     // Create a function to collect and send data to Customer.io
     async function sendToCustomerIO(formData) {
       console.log("Starting sendToCustomerIO function");
       console.log("FormData entries:", Array.from(formData.entries()));
 
-      // Get form field values
-      const firstName = formData.get("First-name") || formData.get("first-name") || formData.get("firstname") || formData.get("Name");
-      const lastName = formData.get("Last-name") || formData.get("last-name") || formData.get("lastname");
-      const email = formData.get("Email") || formData.get("email");
-      const expectedIncome = formData.get("Expected-Income") || formData.get("expected-income") || formData.get("expectedincome");
+      // Get form field values - using Webflow's default field names
+      const firstName = formData.get("name") || formData.get("Name");
+      const email = formData.get("email") || formData.get("Email");
+      const expectedIncome = formData.get("Expected-Income") || formData.get("expected-income");
 
-      console.log("Extracted form values:", { firstName, lastName, email, expectedIncome });
+      console.log("Extracted form values:", { firstName, email, expectedIncome });
+
+      // Split the full name into first and last name
+      let first_name = "",
+        last_name = "";
+      if (firstName) {
+        const nameParts = firstName.split(" ");
+        first_name = nameParts[0] || "";
+        last_name = nameParts.slice(1).join(" ") || "";
+      }
 
       // Prepare data for Customer.io - keeping it simple like the sample request
       const data = {
         data: {
           email: email || "", // Required field
-          first_name: firstName || "",
-          last_name: lastName || "",
+          first_name: first_name,
+          last_name: last_name,
           expected_income: expectedIncome || "",
         },
       };
@@ -59,14 +88,6 @@
         console.error("Error sending to CustomerIO:", error);
       }
     }
-
-    // Store form data when the form is submitted
-    let lastFormData = null;
-    form.addEventListener("submit", function (e) {
-      console.log("Form submit event triggered");
-      lastFormData = new FormData(form);
-      console.log("Form data captured:", Array.from(lastFormData.entries()));
-    });
 
     // Watch for Webflow's form success
     const observer = new MutationObserver((mutations) => {
