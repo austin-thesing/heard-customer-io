@@ -31,29 +31,23 @@
       console.log("Starting sendToCustomerIO function");
       console.log("FormData entries:", Array.from(formData.entries()));
 
-      // Get form field values - using Webflow's default field names
-      const firstName = formData.get("name") || formData.get("Name");
-      const email = formData.get("email") || formData.get("Email");
-      const expectedIncome = formData.get("Expected-Income") || formData.get("expected-income");
+      // Get form field values - using actual field names from the HTML
+      const firstName = formData.get("First-name") || "";
+      const lastName = formData.get("Last-name") || "";
+      const email = formData.get("Email") || "";
+      const expectedIncome = formData.get("Expected_Income") || "";
 
-      console.log("Extracted form values:", { firstName, email, expectedIncome });
-
-      // Split the full name into first and last name
-      let first_name = "",
-        last_name = "";
-      if (firstName) {
-        const nameParts = firstName.split(" ");
-        first_name = nameParts[0] || "";
-        last_name = nameParts.slice(1).join(" ") || "";
-      }
+      console.log("Extracted form values:", { firstName, lastName, email, expectedIncome });
 
       // Prepare data for Customer.io - keeping it simple like the sample request
       const data = {
         data: {
-          email: email || "", // Required field
-          first_name: first_name,
-          last_name: last_name,
-          expected_income: expectedIncome || "",
+          email: email,
+          first_name: firstName,
+          last_name: lastName,
+          expected_income: expectedIncome,
+          form_name: "wf-form-newsletter-customer-io",
+          source_url: window.location.href,
         },
       };
 
