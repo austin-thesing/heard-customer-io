@@ -1,20 +1,22 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
+    console.log("Script initialized");
     const formWrapper = document.querySelector(".w-form");
     const form = formWrapper.querySelector("form");
     form.style.display = "block"; // Show the form initially
 
     // Create a function to collect and send data to Customer.io
     async function sendToCustomerIO(formData) {
-      console.log("Preparing to send data to Customer.io");
+      console.log("Starting sendToCustomerIO function");
+      console.log("FormData entries:", Array.from(formData.entries()));
 
       // Get form field values
-      const firstName = formData.get("First-name");
-      const lastName = formData.get("Last-name");
-      const email = formData.get("Email");
-      const expectedIncome = formData.get("Expected-Income");
+      const firstName = formData.get("First-name") || formData.get("first-name") || formData.get("firstname") || formData.get("Name");
+      const lastName = formData.get("Last-name") || formData.get("last-name") || formData.get("lastname");
+      const email = formData.get("Email") || formData.get("email");
+      const expectedIncome = formData.get("Expected-Income") || formData.get("expected-income") || formData.get("expectedincome");
 
-      console.log("Form values:", { firstName, lastName, email, expectedIncome });
+      console.log("Extracted form values:", { firstName, lastName, email, expectedIncome });
 
       // Prepare data for Customer.io - keeping it simple like the sample request
       const data = {
@@ -26,9 +28,10 @@
         },
       };
 
-      console.log("Data being sent to Customer.io:", data);
+      console.log("Data prepared for Customer.io:", data);
 
       try {
+        console.log("Attempting to send to Customer.io API...");
         // Create base64 encoded credentials exactly as shown in the sample
         const credentials = "c3366c640d351140e43f:baacef12a783b5e0509d";
         const base64Credentials = btoa(credentials);
@@ -44,7 +47,8 @@
         });
 
         const responseText = await response.text();
-        console.log("Customer.io API Response:", response.status, responseText);
+        console.log("Customer.io API Response Status:", response.status);
+        console.log("Customer.io API Response Body:", responseText);
 
         if (!response.ok) {
           console.error("CustomerIO API Error:", responseText);
@@ -59,7 +63,9 @@
     // Store form data when the form is submitted
     let lastFormData = null;
     form.addEventListener("submit", function (e) {
+      console.log("Form submit event triggered");
       lastFormData = new FormData(form);
+      console.log("Form data captured:", Array.from(lastFormData.entries()));
     });
 
     // Watch for Webflow's form success
@@ -69,7 +75,10 @@
           console.log("Webflow form submitted successfully");
           // Use the stored form data
           if (lastFormData) {
+            console.log("Found stored form data, sending to Customer.io");
             sendToCustomerIO(lastFormData);
+          } else {
+            console.error("No stored form data found!");
           }
         }
       });
@@ -77,9 +86,14 @@
 
     // Observe the success message div for changes
     const successDiv = document.querySelector(".w-form-done");
-    observer.observe(successDiv, { attributes: true, attributeFilter: ["style"] });
+    if (successDiv) {
+      console.log("Success div found, setting up observer");
+      observer.observe(successDiv, { attributes: true, attributeFilter: ["style"] });
+    } else {
+      console.error("Could not find success div (.w-form-done)");
+    }
 
-    console.log("Form handler initialized");
+    console.log("Form handler initialization complete");
   });
 </script>
 
