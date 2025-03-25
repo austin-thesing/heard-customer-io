@@ -1,6 +1,7 @@
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("newsletter-form");
+    const formWrapper = document.querySelector(".w-form");
+    const form = formWrapper.querySelector("form");
     form.style.display = "block"; // Show the form initially
 
     // Create a function to collect and send data to Customer.io
@@ -55,14 +56,21 @@
       }
     }
 
+    // Store form data when the form is submitted
+    let lastFormData = null;
+    form.addEventListener("submit", function (e) {
+      lastFormData = new FormData(form);
+    });
+
     // Watch for Webflow's form success
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.target.style.display === "block" && mutation.target.classList.contains("w-form-done")) {
           console.log("Webflow form submitted successfully");
-          // Get form data and send to Customer.io
-          const formData = new FormData(form);
-          sendToCustomerIO(formData);
+          // Use the stored form data
+          if (lastFormData) {
+            sendToCustomerIO(lastFormData);
+          }
         }
       });
     });
