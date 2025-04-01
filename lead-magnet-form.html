@@ -28,9 +28,11 @@
       // Get checkbox values
       const checkedLeadMags = {};
       document.querySelectorAll('.lead-magnet-group input[type="checkbox"]').forEach((checkbox) => {
-        // Convert the name to a valid field name and set it to "true" or "false"
-        const fieldName = checkbox.name.toLowerCase().replace(/[^a-z0-9]/g, "_");
-        checkedLeadMags[fieldName] = checkbox.checked ? "true" : "false";
+        // Only include checked items
+        if (checkbox.checked) {
+          const fieldName = checkbox.name.toLowerCase().replace(/[^a-z0-9]/g, "_");
+          checkedLeadMags[fieldName] = "true";
+        }
       });
 
       console.log("Lead magnets:", checkedLeadMags);
