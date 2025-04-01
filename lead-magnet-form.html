@@ -25,10 +25,10 @@
 
       console.log("Form values:", { firstName, lastName, email, expectedIncome });
 
-      // Get checkbox values
+      // Get checkbox values - only include checked items to preserve historical data
       const checkedLeadMags = {};
       document.querySelectorAll('.lead-magnet-group input[type="checkbox"]').forEach((checkbox) => {
-        // Only include checked items
+        // Only include currently checked items, preserving previous selections in Customer.io
         if (checkbox.checked) {
           const fieldName = checkbox.name.toLowerCase().replace(/[^a-z0-9]/g, "_");
           checkedLeadMags[fieldName] = "true";
