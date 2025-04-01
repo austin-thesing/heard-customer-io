@@ -107,7 +107,8 @@
       if (search) {
         search.split("&").forEach((item) => {
           const parts = item.split("=");
-          if (parts[0]) {
+          // Only include parameters that start with utm_
+          if (parts[0] && parts[0].toLowerCase().startsWith("utm_")) {
             params[parts[0]] = parts[1] ? decodeURIComponent(parts[1]) : "";
           }
         });
@@ -119,7 +120,7 @@
       const utmParams = getUrlParams();
       const utmField = document.getElementById("UTM");
 
-      if (utmField) {
+      if (utmField && Object.keys(utmParams).length > 0) {
         utmField.value = JSON.stringify(utmParams);
       }
     }
